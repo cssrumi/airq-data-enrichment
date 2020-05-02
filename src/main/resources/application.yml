@@ -9,7 +9,6 @@ quarkus:
         expire-after-write: 30M
       "CurrentWeatherByCoordinates":
         expire-after-write: 30M
-
   datasource:
     db-kind: postgresql
     username: postgres
