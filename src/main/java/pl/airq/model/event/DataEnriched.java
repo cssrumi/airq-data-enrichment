@@ -1,7 +1,9 @@
 package pl.airq.model.event;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.time.OffsetDateTime;
 
+@RegisterForReflection
 public class DataEnriched extends Event<DataEnrichedPayload> {
 
     public DataEnriched(OffsetDateTime dateTime, DataEnrichedPayload payload) {

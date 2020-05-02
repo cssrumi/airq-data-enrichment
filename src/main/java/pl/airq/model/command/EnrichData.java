@@ -1,7 +1,9 @@
 package pl.airq.model.command;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.time.OffsetDateTime;
 
+@RegisterForReflection
 public class EnrichData extends Command<EnrichDataPayload> {
 
     public EnrichData(OffsetDateTime dateTime, EnrichDataPayload payload) {

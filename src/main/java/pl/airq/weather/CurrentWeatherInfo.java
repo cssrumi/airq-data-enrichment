@@ -1,5 +1,8 @@
 package pl.airq.weather;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class CurrentWeatherInfo {
 
     public final Float temperature;

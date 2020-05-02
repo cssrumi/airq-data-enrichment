@@ -1,14 +1,14 @@
 package pl.airq.domain.gios;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.time.OffsetDateTime;
 import pl.airq.domain.gios.installation.Installation;
 
-import static io.netty.util.internal.SystemPropertyUtil.contains;
-
+@RegisterForReflection
 public class GiosMeasurement {
 
     private static final GiosMeasurement EMPTY = new GiosMeasurement(null, null, null, null, null, null);
-    
+
     public final String name;
     public final OffsetDateTime timestamp;
     public final Float pm10;
@@ -50,7 +50,7 @@ public class GiosMeasurement {
     static Builder builder() {
         return new Builder();
     }
-    
+
     static GiosMeasurement empty() {
         return EMPTY;
     }
@@ -107,14 +107,14 @@ public class GiosMeasurement {
         if (code.contains("PM10")) {
             return new GiosMeasurement(installation.name, installation.timestamp, installation.value, null, installation.lon, installation.lat);
         }
-        
+
         if (code.contains("PM25") || code.contains("PM2.5")) {
             return new GiosMeasurement(installation.name, installation.timestamp, null, installation.value, installation.lon, installation.lat);
         }
 
         throw new UnsupportedOperationException("Invalid installation type: " + installation.toString());
     }
-    
+
     static GiosMeasurement merge(GiosMeasurement giosMeasurement, Installation installation) {
         final Builder builder = giosMeasurement.toBuilder();
         return merge(builder, installation);
@@ -122,7 +122,7 @@ public class GiosMeasurement {
 
     static GiosMeasurement merge(Builder giosMeasurementBuilder, Installation installation) {
         final String code = installation.code.toUpperCase();
-        if (code.contains("PM10")){
+        if (code.contains("PM10")) {
             giosMeasurementBuilder.pm10(installation.value);
         }
 

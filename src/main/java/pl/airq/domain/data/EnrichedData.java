@@ -1,11 +1,13 @@
 package pl.airq.domain.data;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.vertx.mutiny.sqlclient.Row;
 import java.time.OffsetDateTime;
 import pl.airq.domain.DataProvider;
 import pl.airq.domain.gios.GiosMeasurement;
 import pl.airq.weather.CurrentWeatherInfo;
 
+@RegisterForReflection
 public final class EnrichedData {
 
     public final OffsetDateTime timestamp;

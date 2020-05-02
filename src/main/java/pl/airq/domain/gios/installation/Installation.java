@@ -1,8 +1,10 @@
 package pl.airq.domain.gios.installation;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.vertx.mutiny.sqlclient.Row;
 import java.time.OffsetDateTime;
 
+@RegisterForReflection
 public class Installation {
 
     public final Long id;
