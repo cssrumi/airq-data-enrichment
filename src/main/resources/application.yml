@@ -1,0 +1,44 @@
+quarkus:
+  application:
+    name: data-enrichment
+  cache:
+    caffeine:
+      "CurrentWeatherByCityAndCountry":
+        expire-after-write: 30M
+      "CurrentWeatherByCityInPoland":
+        expire-after-write: 30M
+      "CurrentWeatherByCoordinates":
+        expire-after-write: 30M
+
+  datasource:
+    db-kind: postgresql
+    username: postgres
+    jdbc:
+      url: jdbc:postgresql://10.1.1.50:5432/warehouse
+    reactive:
+      url: postgresql://10.1.1.50:5432/warehouse
+  flyway:
+    migrate-at-start: true
+    baseline-on-migrate: true
+  vertx:
+    prefer-native-transport: true
+
+mp:
+  messaging:
+    outgoing:
+      data-enriched:
+        connector: smallrye-kafka
+        topic: data.enriched
+        value:
+          serializer: org.apache.kafka.common.serialization.StringSerializer
+
+kafka:
+  bootstrap:
+    servers: 10.1.1.51:9092
+
+data-enrichment:
+  emitter:
+    cron: 0 20 * * * ?
+  open-weather:
+    api/mp-rest/url: https://api.openweathermap.org/data
+    api/mp-rest/scope: javax.inject.Singleton
