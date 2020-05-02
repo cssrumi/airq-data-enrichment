@@ -45,17 +45,17 @@ public class EnrichedDataPersistentRepositoryPostgres implements PersistentRepos
     }
 
     private Tuple prepareEnrichedDataTuple(EnrichedData enrichedData) {
-        return Tuple.of(enrichedData.getTimestamp())
-                    .addFloat(enrichedData.getPm10())
-                    .addFloat(enrichedData.getPm25())
-                    .addFloat(enrichedData.getTemp())
-                    .addFloat(enrichedData.getWind())
-                    .addFloat(enrichedData.getWindDirection())
-                    .addFloat(enrichedData.getHumidity())
-                    .addFloat(enrichedData.getPressure())
-                    .addFloat(enrichedData.getLon())
-                    .addFloat(enrichedData.getLat())
-                    .addString(enrichedData.getProvider().name())
-                    .addString(enrichedData.getStation());
+        return Tuple.of(enrichedData.timestamp)
+                    .addFloat(enrichedData.pm10)
+                    .addFloat(enrichedData.pm25)
+                    .addFloat(enrichedData.temp)
+                    .addFloat(enrichedData.wind)
+                    .addFloat(enrichedData.windDirection)
+                    .addFloat(enrichedData.humidity)
+                    .addFloat(enrichedData.pressure)
+                    .addFloat(enrichedData.lon)
+                    .addFloat(enrichedData.lat)
+                    .addString(enrichedData.provider.name())
+                    .addString(enrichedData.station);
     }
 }

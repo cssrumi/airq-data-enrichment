@@ -8,18 +8,18 @@ import pl.airq.weather.CurrentWeatherInfo;
 
 public final class EnrichedData {
 
-    private final OffsetDateTime timestamp;
-    private final Float pm10;
-    private final Float pm25;
-    private final Float temp;
-    private final Float wind;
-    private final Float windDirection;
-    private final Float humidity;
-    private final Float pressure;
-    private final Float lon;
-    private final Float lat;
-    private final DataProvider provider;
-    private final String station;
+    public final OffsetDateTime timestamp;
+    public final Float pm10;
+    public final Float pm25;
+    public final Float temp;
+    public final Float wind;
+    public final Float windDirection;
+    public final Float humidity;
+    public final Float pressure;
+    public final Float lon;
+    public final Float lat;
+    public final DataProvider provider;
+    public final String station;
 
 
     public EnrichedData(OffsetDateTime timestamp, Float pm10, Float pm25, Float temp, Float wind, Float windDirection, Float humidity, Float pressure,
@@ -45,54 +45,6 @@ public final class EnrichedData {
                 row.getFloat("humidity"), row.getFloat("pressure"), row.getFloat("lon"),
                 row.getFloat("lat"), DataProvider.valueOf(row.getString("provider")), row.getString("station")
         );
-    }
-
-    public OffsetDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public Float getPm10() {
-        return pm10;
-    }
-
-    public Float getPm25() {
-        return pm25;
-    }
-
-    public Float getTemp() {
-        return temp;
-    }
-
-    public Float getWind() {
-        return wind;
-    }
-
-    public Float getWindDirection() {
-        return windDirection;
-    }
-
-    public Float getHumidity() {
-        return humidity;
-    }
-
-    public Float getPressure() {
-        return pressure;
-    }
-
-    public Float getLon() {
-        return lon;
-    }
-
-    public Float getLat() {
-        return lat;
-    }
-
-    public DataProvider getProvider() {
-        return provider;
-    }
-
-    public String getStation() {
-        return station;
     }
 
     @Override
