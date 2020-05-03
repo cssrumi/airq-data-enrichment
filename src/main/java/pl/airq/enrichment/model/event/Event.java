@@ -1,8 +1,10 @@
 package pl.airq.enrichment.model.event;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.time.OffsetDateTime;
 import pl.airq.enrichment.model.Payload;
 
+@RegisterForReflection
 public abstract class Event<P extends Payload> {
 
     public final OffsetDateTime dateTime;
