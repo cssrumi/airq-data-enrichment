@@ -2,7 +2,11 @@ package pl.airq.enrichment.domain.gios;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.time.OffsetDateTime;
-import pl.airq.enrichment.domain.gios.installation.Installation;
+import pl.airq.common.domain.DataProvider;
+import pl.airq.common.domain.enriched.EnrichedData;
+import pl.airq.common.domain.gios.installation.Installation;
+import pl.airq.common.vo.StationId;
+import pl.airq.enrichment.weather.CurrentWeatherInfo;
 
 @RegisterForReflection
 public class GiosMeasurement {
@@ -25,13 +29,13 @@ public class GiosMeasurement {
         this.lat = lat;
     }
 
-    Builder toBuilder() {
-        return builder().name(name)
-                        .timestamp(timestamp)
-                        .pm10(pm10)
-                        .pm25(pm25)
-                        .lat(lat)
-                        .lon(lon);
+    public EnrichedData enrich(CurrentWeatherInfo weatherInfo) {
+        return new EnrichedData(
+                timestamp, pm10, pm25,
+                weatherInfo.temperature, weatherInfo.wind, weatherInfo.windDirection,
+                weatherInfo.humidity, weatherInfo.pressure, lon,
+                lat, DataProvider.GIOS, StationId.from(name)
+        );
     }
 
     GiosMeasurement merge(GiosMeasurement giosMeasurement) {
@@ -45,6 +49,15 @@ public class GiosMeasurement {
         }
 
         return builder.build();
+    }
+
+    Builder toBuilder() {
+        return builder().name(name)
+                        .timestamp(timestamp)
+                        .pm10(pm10)
+                        .pm25(pm25)
+                        .lat(lat)
+                        .lon(lon);
     }
 
     static Builder builder() {

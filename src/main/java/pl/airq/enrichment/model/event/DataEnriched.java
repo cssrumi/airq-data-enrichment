@@ -1,21 +1,27 @@
 package pl.airq.enrichment.model.event;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import java.time.OffsetDateTime;
+import pl.airq.common.domain.process.event.AppEvent;
+
+import static pl.airq.enrichment.model.TopicConstant.DATA_ENRICHED_TOPIC;
 
 @RegisterForReflection
-public class DataEnriched extends Event<DataEnrichedPayload> {
+public class DataEnriched extends AppEvent<DataEnrichedPayload> {
 
-    public DataEnriched(OffsetDateTime dateTime, DataEnrichedPayload payload) {
-        super(dateTime, payload, DataEnriched.class.getSimpleName());
+    public DataEnriched(DataEnrichedPayload payload) {
+        super(payload);
+    }
+
+    @Override
+    public String defaultTopic() {
+        return DATA_ENRICHED_TOPIC;
     }
 
     @Override
     public String toString() {
         return "DataEnriched{" +
-                "dateTime=" + dateTime +
+                "timestamp=" + timestamp +
                 ", payload=" + payload +
-                ", eventType='" + eventType + '\'' +
                 '}';
     }
 }

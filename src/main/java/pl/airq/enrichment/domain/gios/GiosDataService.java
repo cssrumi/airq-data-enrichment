@@ -7,30 +7,30 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import pl.airq.enrichment.domain.gios.installation.Installation;
-import pl.airq.enrichment.domain.gios.installation.InstallationRepository;
+import pl.airq.common.domain.gios.installation.Installation;
+import pl.airq.common.domain.gios.installation.InstallationQuery;
 
 import static java.util.stream.Collectors.groupingBy;
 
 @ApplicationScoped
 public class GiosDataService {
 
-    private final InstallationRepository installationRepository;
+    private final InstallationQuery installationQuery;
 
     @Inject
-    public GiosDataService(InstallationRepository installationRepository) {
-        this.installationRepository = installationRepository;
+    public GiosDataService(InstallationQuery installationQuery) {
+        this.installationQuery = installationQuery;
     }
 
     public Uni<Set<Installation>> getInstallationsSinceLastHour() {
-        return installationRepository.getAllWithPMSinceLastHour();
+        return installationQuery.getAllWithPMSinceLastHour();
     }
 
     public Uni<Set<GiosMeasurement>> getMeasurementsSinceLastHour() {
-        return installationRepository.getAllWithPMSinceLastHour()
-                                     .map(installations ->
-                                             mapInstallationsToGiosMeasurements(installations.stream()
-                                                                                             .collect(groupingBy(installation -> installation.id))));
+        return installationQuery.getAllWithPMSinceLastHour()
+                                .map(installations ->
+                                        mapInstallationsToGiosMeasurements(installations.stream()
+                                                                                        .collect(groupingBy(installation -> installation.id))));
     }
 
     private Set<GiosMeasurement> mapInstallationsToGiosMeasurements(Map<Long, List<Installation>> installationsPerStation) {

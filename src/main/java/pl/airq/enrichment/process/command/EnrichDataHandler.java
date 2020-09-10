@@ -9,18 +9,17 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.airq.enrichment.domain.DataProvider;
+import pl.airq.common.domain.DataProvider;
+import pl.airq.common.domain.enriched.EnrichedData;
+import pl.airq.common.domain.process.AppEventBus;
+import pl.airq.common.domain.process.Try;
 import pl.airq.enrichment.domain.data.DataService;
-import pl.airq.enrichment.domain.data.EnrichedData;
 import pl.airq.enrichment.domain.gios.GiosDataService;
-import pl.airq.enrichment.model.Try;
 import pl.airq.enrichment.model.command.EnrichData;
 import pl.airq.enrichment.model.event.DataEnriched;
 import pl.airq.enrichment.model.event.DataEnrichedPayload;
-import pl.airq.enrichment.process.AirqEventBus;
 
-import static pl.airq.enrichment.domain.DataProvider.GIOS;
-import static pl.airq.enrichment.model.TopicConstant.DATA_ENRICHED_TOPIC;
+import static pl.airq.common.domain.DataProvider.GIOS;
 import static pl.airq.enrichment.model.TopicConstant.ENRICH_DATA_TOPIC;
 
 @ApplicationScoped
@@ -29,10 +28,11 @@ class EnrichDataHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnrichDataHandler.class);
     private final DataService dataService;
     private final GiosDataService giosDataService;
-    private final AirqEventBus eventBus;
+    private final AppEventBus eventBus;
 
     @Inject
-    public EnrichDataHandler(DataService dataService, GiosDataService giosDataService, AirqEventBus eventBus) {
+    public EnrichDataHandler(DataService dataService, GiosDataService giosDataService,
+                             AppEventBus eventBus) {
         this.dataService = dataService;
         this.giosDataService = giosDataService;
         this.eventBus = eventBus;
@@ -43,9 +43,9 @@ class EnrichDataHandler {
         return Try.raw(Uni.createFrom()
                           .item(command.payload.providersToEnrich)
                           .onItem()
-                          .produceUni(this::enrichData)
+                          .transformToUni(this::enrichData)
                           .onItem()
-                          .produceUni(this::saveAndPublish));
+                          .transformToUni(this::saveAndPublish));
     }
 
     private Uni<List<EnrichedData>> enrichData(List<DataProvider> providers) {
@@ -54,7 +54,7 @@ class EnrichDataHandler {
             LOGGER.info("EnrichData for GIOS");
             enrichedDataMulti = giosDataService.getMeasurementsSinceLastHour()
                                                .onItem()
-                                               .produceMulti(giosMeasurements -> Multi.createFrom()
+                                               .transformToMulti(giosMeasurements -> Multi.createFrom()
                                                                                       .iterable(giosMeasurements))
                                                .flatMap(giosMeasurement -> dataService.enrichGiosData(giosMeasurement)
                                                                                       .toMulti());
@@ -73,15 +73,15 @@ class EnrichDataHandler {
                     .collectItems()
                     .asList()
                     .onItem()
-                    .produceUni(ignore -> publishDataEnrichedEvent(enrichedData));
+                    .transformToUni(ignore -> publishDataEnrichedEvent(enrichedData));
     }
 
     private Uni<Void> publishDataEnrichedEvent(List<EnrichedData> enrichedData) {
         return Uni.createFrom().item(() -> {
             LOGGER.info("Publishing DataEnriched Event...");
             DataEnrichedPayload payload = new DataEnrichedPayload(enrichedData);
-            DataEnriched event = new DataEnriched(OffsetDateTime.now(), payload);
-            eventBus.publish(DATA_ENRICHED_TOPIC, event);
+            DataEnriched event = new DataEnriched(payload);
+            eventBus.publish(event);
             LOGGER.info("DataEnriched Event published.");
             return null;
         });

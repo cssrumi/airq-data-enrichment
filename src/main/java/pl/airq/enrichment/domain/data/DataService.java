@@ -5,7 +5,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.airq.enrichment.domain.PersistentRepository;
+import pl.airq.common.domain.PersistentRepository;
+import pl.airq.common.domain.enriched.EnrichedData;
 import pl.airq.enrichment.domain.gios.GiosMeasurement;
 import pl.airq.enrichment.weather.WeatherService;
 
@@ -27,7 +28,7 @@ public class DataService {
                              .onItem()
                              .apply(currentWeatherInfo -> {
                                  LOGGER.info("Enriching gios measurement: " + giosMeasurement);
-                                 return EnrichedData.enrichGiosData(giosMeasurement, currentWeatherInfo);
+                                 return giosMeasurement.enrich(currentWeatherInfo);
                              });
     }
 

@@ -2,8 +2,8 @@ package pl.airq.enrichment.model.event;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.List;
-import pl.airq.enrichment.domain.data.EnrichedData;
-import pl.airq.enrichment.model.Payload;
+import pl.airq.common.domain.enriched.EnrichedData;
+import pl.airq.common.domain.process.Payload;
 
 @RegisterForReflection
 public class DataEnrichedPayload implements Payload {

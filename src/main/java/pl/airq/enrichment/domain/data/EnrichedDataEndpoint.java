@@ -7,15 +7,16 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import pl.airq.common.domain.enriched.EnrichedDataQuery;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/v1/data/enriched")
 public class EnrichedDataEndpoint {
 
-    private final EnrichedDataQueryRepository queryRepository;
+    private final EnrichedDataQuery queryRepository;
 
     @Inject
-    public EnrichedDataEndpoint(EnrichedDataQueryRepository queryRepository) {
+    public EnrichedDataEndpoint(EnrichedDataQuery queryRepository) {
         this.queryRepository = queryRepository;
     }
 

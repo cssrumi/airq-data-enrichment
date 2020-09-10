@@ -42,8 +42,7 @@ class DataEnrichedHandler {
                           return null;
                       }
                   })
-                  .onItem()
-                  .produceCompletionStage(externalTopic::send)
+                  .flatMap(msg -> Uni.createFrom().completionStage(externalTopic.send(msg)))
                   .onItem()
                   .invoke(ignore -> LOGGER.info(String.format("%s has been passed to External Bus.", event.getClass().getSimpleName())));
     }

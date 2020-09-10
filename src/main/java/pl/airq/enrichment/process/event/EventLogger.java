@@ -4,11 +4,12 @@ import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import javax.enterprise.context.ApplicationScoped;
 import pl.airq.enrichment.model.event.DataEnriched;
 
 import static pl.airq.enrichment.model.TopicConstant.DATA_ENRICHED_TOPIC;
 
-
+@ApplicationScoped
 class EventLogger {
 
     static final String EVENT_CONSUMED_TEMPLATE = "%s event consumed. Event: %s";

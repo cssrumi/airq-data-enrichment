@@ -7,7 +7,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.airq.enrichment.domain.PersistentRepository;
+import pl.airq.common.domain.PersistentRepository;
+import pl.airq.common.domain.enriched.EnrichedData;
+import pl.airq.common.domain.enriched.EnrichedDataQuery;
 
 @ApplicationScoped
 public class EnrichedDataPersistentRepositoryPostgres implements PersistentRepository<EnrichedData> {
@@ -15,17 +17,18 @@ public class EnrichedDataPersistentRepositoryPostgres implements PersistentRepos
     private static final Logger LOGGER = LoggerFactory.getLogger(EnrichedDataPersistentRepositoryPostgres.class);
     static final String INSERT_QUERY = "INSERT INTO ENRICHED_DATA (\"timestamp\", pm10, pm25, temperature, wind, winddirection, humidity, pressure, lon, lat, provider, station) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)";
     private final PgPool client;
-    private final EnrichedDataQueryRepository dataQueryRepository;
+    private final EnrichedDataQuery dataQueryRepository;
 
     @Inject
-    public EnrichedDataPersistentRepositoryPostgres(PgPool client, EnrichedDataQueryRepository dataQueryRepository) {
+    public EnrichedDataPersistentRepositoryPostgres(PgPool client, EnrichedDataQuery dataQueryRepository) {
         this.client = client;
         this.dataQueryRepository = dataQueryRepository;
     }
 
     @Override
     public Uni<Boolean> save(EnrichedData data) {
-        return client.preparedQuery(INSERT_QUERY, prepareEnrichedDataTuple(data))
+        return client.preparedQuery(INSERT_QUERY)
+                     .execute(prepareEnrichedDataTuple(data))
                      .onItem()
                      .apply(result -> {
                          if (result.rowCount() != 0) {
@@ -56,6 +59,6 @@ public class EnrichedDataPersistentRepositoryPostgres implements PersistentRepos
                     .addFloat(enrichedData.lon)
                     .addFloat(enrichedData.lat)
                     .addString(enrichedData.provider.name())
-                    .addString(enrichedData.station);
+                    .addString(enrichedData.station.getId());
     }
 }
