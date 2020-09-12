@@ -14,9 +14,10 @@ properties = pom_root.find(NS+'properties')
 common_version = properties.find(NS + 'common.version').text
 
 tag = company + '/' + artifact_id + ':' + version
+latest_tag = company + '/' + artifact_id + ':latest'
 common_tag = 'COMMON_TAG=' + common_version
 
 print("building {} using common {}".format(tag, common_version))
 
-build = subprocess.Popen(['docker', 'build', '-f', 'src/main/docker/Dockerfile.multistage', '-t', tag, '--build-arg', common_tag, '.'])
+build = subprocess.Popen(['docker', 'build', '-f', 'src/main/docker/Dockerfile.multistage', '-t', tag, '-t', latest_tag, '--build-arg', common_tag, '.'])
 build.wait()
