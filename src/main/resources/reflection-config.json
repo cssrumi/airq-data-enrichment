@@ -2,5 +2,9 @@
   {
     "name" : "com.github.benmanes.caffeine.cache.SSW",
     "allDeclaredConstructors" : true
+  },
+  {
+    "name" : "com.github.benmanes.caffeine.cache.PSW",
+    "allDeclaredConstructors" : true
   }
 ]
