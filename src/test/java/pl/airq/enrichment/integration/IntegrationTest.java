@@ -62,7 +62,7 @@ class IntegrationTest {
     private EventParser parser;
 
     @Test
-    void integration_whenEnrichDataEventEmitted_expect() {
+    void integration_whenEnrichDataEventEmitted_expectValidEventSentToKafka() {
         Long id = 1L;
         Float pm10 = 1.0f;
         Float pm25 = 2.5f;
@@ -93,6 +93,7 @@ class IntegrationTest {
         assertEquals(weatherInfo.humidity, result.humidity);
         assertEquals(weatherInfo.pressure, result.pressure);
         verify(dataService, times(1)).enrichGiosData(any());
+        verify(weatherService, times(1)).getCurrentWeatherInfoByCoordinates(any(), any());
     }
 
     @Dependent
