@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.airq.common.domain.DataProvider;
-import pl.airq.common.domain.process.AppEventBus;
+import pl.airq.common.process.AppEventBus;
 import pl.airq.enrichment.model.command.EnrichData;
 import pl.airq.enrichment.model.command.EnrichDataPayload;
 
@@ -23,7 +23,7 @@ class EnrichDataEmitter {
     }
 
     @Scheduled(cron = "{data-enrichment.emitter.cron}")
-    void enrichDataScheduler() {
+    void emitEnrichDataEvent() {
         EnrichData enrichData = new EnrichData(new EnrichDataPayload(Arrays.asList(DataProvider.values())));
         bus.sendAndForget(enrichData);
         LOGGER.info(String.format("%s command has been send.\nCommand: %s", EnrichData.class.getSimpleName(), enrichData));

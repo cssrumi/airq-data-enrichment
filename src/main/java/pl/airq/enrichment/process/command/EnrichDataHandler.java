@@ -3,7 +3,6 @@ package pl.airq.enrichment.process.command;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import java.time.OffsetDateTime;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -11,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.airq.common.domain.DataProvider;
 import pl.airq.common.domain.enriched.EnrichedData;
-import pl.airq.common.domain.process.AppEventBus;
-import pl.airq.common.domain.process.Try;
+import pl.airq.common.process.AppEventBus;
+import pl.airq.common.process.Try;
 import pl.airq.enrichment.domain.data.DataService;
 import pl.airq.enrichment.domain.gios.GiosDataService;
 import pl.airq.enrichment.model.command.EnrichData;
@@ -55,7 +54,7 @@ class EnrichDataHandler {
             enrichedDataMulti = giosDataService.getMeasurementsSinceLastHour()
                                                .onItem()
                                                .transformToMulti(giosMeasurements -> Multi.createFrom()
-                                                                                      .iterable(giosMeasurements))
+                                                                                          .iterable(giosMeasurements))
                                                .flatMap(giosMeasurement -> dataService.enrichGiosData(giosMeasurement)
                                                                                       .toMulti());
         } else {

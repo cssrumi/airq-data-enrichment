@@ -25,8 +25,7 @@ public class DataService {
 
     public Uni<EnrichedData> enrichGiosData(GiosMeasurement giosMeasurement) {
         return weatherService.getCurrentWeatherInfoByCoordinates(giosMeasurement.lon.toString(), giosMeasurement.lat.toString())
-                             .onItem()
-                             .apply(currentWeatherInfo -> {
+                             .onItem().transform(currentWeatherInfo -> {
                                  LOGGER.info("Enriching gios measurement: " + giosMeasurement);
                                  return giosMeasurement.enrich(currentWeatherInfo);
                              });
@@ -34,12 +33,11 @@ public class DataService {
 
     public Uni<Void> save(EnrichedData enrichedData) {
         return enrichedDataRepository.save(enrichedData)
-                                     .onItem()
-                                     .apply(this::checkResult);
+                                     .onItem().transform(this::checkResult);
     }
 
     private Void checkResult(Boolean result) {
-        if (result == Boolean.FALSE) {
+        if (Boolean.FALSE.equals(result)) {
             LOGGER.error("Unable to save EnrichedData.");
             throw new RuntimeException("Unable to save EnrichedData.");
         }

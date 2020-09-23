@@ -10,7 +10,7 @@ import javax.ws.rs.core.Response;
 import pl.airq.common.domain.enriched.EnrichedDataQuery;
 
 @Produces(MediaType.APPLICATION_JSON)
-@Path("/v1/data/enriched")
+@Path("/api/data/enriched")
 public class EnrichedDataEndpoint {
 
     private final EnrichedDataQuery queryRepository;

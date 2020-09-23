@@ -13,15 +13,15 @@ public class GiosMeasurement {
 
     private static final GiosMeasurement EMPTY = new GiosMeasurement(null, null, null, null, null, null);
 
-    public final String name;
+    public final String installation;
     public final OffsetDateTime timestamp;
     public final Float pm10;
     public final Float pm25;
     public final Float lon;
     public final Float lat;
 
-    GiosMeasurement(String name, OffsetDateTime timestamp, Float pm10, Float pm25, Float lon, Float lat) {
-        this.name = name;
+    GiosMeasurement(String installation, OffsetDateTime timestamp, Float pm10, Float pm25, Float lon, Float lat) {
+        this.installation = installation;
         this.timestamp = timestamp;
         this.pm10 = pm10;
         this.pm25 = pm25;
@@ -34,7 +34,7 @@ public class GiosMeasurement {
                 timestamp, pm10, pm25,
                 weatherInfo.temperature, weatherInfo.wind, weatherInfo.windDirection,
                 weatherInfo.humidity, weatherInfo.pressure, lon,
-                lat, DataProvider.GIOS, StationId.from(name)
+                lat, DataProvider.GIOS, StationId.from(installation)
         );
     }
 
@@ -52,7 +52,7 @@ public class GiosMeasurement {
     }
 
     Builder toBuilder() {
-        return builder().name(name)
+        return builder().installation(installation)
                         .timestamp(timestamp)
                         .pm10(pm10)
                         .pm25(pm25)
@@ -69,7 +69,7 @@ public class GiosMeasurement {
     }
 
     static class Builder {
-        private String name;
+        private String installation;
         private OffsetDateTime timestamp;
         private Float pm10;
         private Float pm25;
@@ -79,8 +79,8 @@ public class GiosMeasurement {
         Builder() {
         }
 
-        Builder name(String name) {
-            this.name = name;
+        Builder installation(String installation) {
+            this.installation = installation;
             return this;
         }
 
@@ -110,7 +110,7 @@ public class GiosMeasurement {
         }
 
         GiosMeasurement build() {
-            return new GiosMeasurement(name, timestamp, pm10, pm25, lon, lat);
+            return new GiosMeasurement(installation, timestamp, pm10, pm25, lon, lat);
         }
 
     }

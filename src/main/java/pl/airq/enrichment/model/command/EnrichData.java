@@ -1,7 +1,7 @@
 package pl.airq.enrichment.model.command;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import pl.airq.common.domain.process.command.AppCommand;
+import pl.airq.common.process.command.AppCommand;
 
 import static pl.airq.enrichment.model.TopicConstant.ENRICH_DATA_TOPIC;
 

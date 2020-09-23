@@ -31,6 +31,8 @@ mp:
           serializer: org.apache.kafka.common.serialization.StringSerializer
 
 kafka:
+  group:
+    id: airq-data-enrichment
   bootstrap:
     servers: 10.1.1.51:9092
 
@@ -40,3 +42,16 @@ data-enrichment:
   open-weather:
     api/mp-rest/url: https://api.openweathermap.org/data
     api/mp-rest/scope: javax.inject.Singleton
+
+"%dev":
+  quarkus:
+    http:
+      port: 8090
+
+"%test":
+  quarkus:
+    scheduler:
+      enabled: false
+  data-enrichment:
+    open-weather:
+      api-key: any

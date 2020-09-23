@@ -7,11 +7,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import pl.airq.common.domain.DataProvider;
-import pl.airq.common.domain.process.AppEventBus;
+import pl.airq.common.process.AppEventBus;
 import pl.airq.enrichment.model.command.EnrichData;
 import pl.airq.enrichment.model.command.EnrichDataPayload;
 
-@Path("/v1/emit")
+@Path("/api/emit")
 public class EnrichDataEmitterEndpoint {
 
     private final AppEventBus eventBus;

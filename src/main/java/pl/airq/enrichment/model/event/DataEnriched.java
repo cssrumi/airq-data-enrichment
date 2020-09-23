@@ -1,7 +1,7 @@
 package pl.airq.enrichment.model.event;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import pl.airq.common.domain.process.event.AppEvent;
+import pl.airq.common.process.event.AppEvent;
 
 import static pl.airq.enrichment.model.TopicConstant.DATA_ENRICHED_TOPIC;
 
