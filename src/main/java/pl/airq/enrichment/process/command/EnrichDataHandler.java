@@ -13,27 +13,26 @@ import pl.airq.common.domain.enriched.EnrichedData;
 import pl.airq.common.process.AppEventBus;
 import pl.airq.common.process.Try;
 import pl.airq.enrichment.domain.data.DataService;
-import pl.airq.enrichment.domain.gios.GiosDataService;
-import pl.airq.enrichment.model.command.EnrichData;
-import pl.airq.enrichment.model.event.DataEnriched;
-import pl.airq.enrichment.model.event.DataEnrichedPayload;
+import pl.airq.enrichment.domain.gios.GiosService;
+import pl.airq.enrichment.process.event.DataEnriched;
+import pl.airq.enrichment.process.event.DataEnrichedPayload;
 
 import static pl.airq.common.domain.DataProvider.GIOS;
-import static pl.airq.enrichment.model.TopicConstant.ENRICH_DATA_TOPIC;
+import static pl.airq.enrichment.process.TopicConstant.ENRICH_DATA_TOPIC;
 
 @ApplicationScoped
 class EnrichDataHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EnrichDataHandler.class);
     private final DataService dataService;
-    private final GiosDataService giosDataService;
+    private final GiosService giosService;
     private final AppEventBus eventBus;
 
     @Inject
-    public EnrichDataHandler(DataService dataService, GiosDataService giosDataService,
+    public EnrichDataHandler(DataService dataService, GiosService giosService,
                              AppEventBus eventBus) {
         this.dataService = dataService;
-        this.giosDataService = giosDataService;
+        this.giosService = giosService;
         this.eventBus = eventBus;
     }
 
@@ -51,11 +50,11 @@ class EnrichDataHandler {
         Multi<EnrichedData> enrichedDataMulti;
         if (providers.contains(GIOS)) {
             LOGGER.info("EnrichData for GIOS");
-            enrichedDataMulti = giosDataService.getMeasurementsSinceLastHour()
-                                               .onItem()
-                                               .transformToMulti(giosMeasurements -> Multi.createFrom()
+            enrichedDataMulti = giosService.getMeasurementsSinceLastHour()
+                                           .onItem()
+                                           .transformToMulti(giosMeasurements -> Multi.createFrom()
                                                                                           .iterable(giosMeasurements))
-                                               .flatMap(giosMeasurement -> dataService.enrichGiosData(giosMeasurement)
+                                           .flatMap(giosMeasurement -> dataService.enrichGiosData(giosMeasurement)
                                                                                       .toMulti());
         } else {
             enrichedDataMulti = Multi.createFrom().empty();

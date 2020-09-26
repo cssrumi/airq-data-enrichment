@@ -1,4 +1,4 @@
-package pl.airq.enrichment.model.command;
+package pl.airq.enrichment.process.command;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.List;

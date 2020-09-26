@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import pl.airq.common.domain.enriched.AirqDataEnrichedEvent;
 import pl.airq.common.domain.enriched.AirqDataEnrichedPayload;
-import pl.airq.enrichment.model.event.DataEnriched;
 
 class AirqDataEnrichedEventFactory {
 

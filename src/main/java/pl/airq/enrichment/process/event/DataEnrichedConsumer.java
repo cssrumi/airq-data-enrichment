@@ -12,8 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.airq.common.domain.enriched.AirqDataEnrichedEvent;
 import pl.airq.common.process.EventParser;
-import pl.airq.enrichment.model.TopicConstant;
-import pl.airq.enrichment.model.event.DataEnriched;
+import pl.airq.enrichment.process.TopicConstant;
 
 @ApplicationScoped
 class DataEnrichedConsumer {

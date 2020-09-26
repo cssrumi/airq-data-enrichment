@@ -1,9 +1,9 @@
-package pl.airq.enrichment.model.command;
+package pl.airq.enrichment.process.command;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import pl.airq.common.process.command.AppCommand;
 
-import static pl.airq.enrichment.model.TopicConstant.ENRICH_DATA_TOPIC;
+import static pl.airq.enrichment.process.TopicConstant.ENRICH_DATA_TOPIC;
 
 @RegisterForReflection
 public class EnrichData extends AppCommand<EnrichDataPayload, Void> {

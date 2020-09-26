@@ -24,7 +24,6 @@ import pl.airq.common.process.EventParser;
 import pl.airq.common.process.event.AirqEvent;
 import pl.airq.enrichment.domain.data.DataService;
 import pl.airq.enrichment.domain.data.MockEnrichedDataRepositoryPostgres;
-import pl.airq.enrichment.domain.gios.GiosMeasurement;
 import pl.airq.enrichment.process.emitter.EnrichDataEmitterPublicProxy;
 import pl.airq.enrichment.weather.CurrentWeatherInfo;
 import pl.airq.enrichment.weather.CurrentWeatherInfoFactory;

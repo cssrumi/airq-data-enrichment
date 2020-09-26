@@ -5,9 +5,9 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
-import pl.airq.enrichment.model.event.DataEnriched;
+import pl.airq.common.process.MutinyUtils;
 
-import static pl.airq.enrichment.model.TopicConstant.DATA_ENRICHED_TOPIC;
+import static pl.airq.enrichment.process.TopicConstant.DATA_ENRICHED_TOPIC;
 
 @ApplicationScoped
 class EventLogger {
@@ -17,9 +17,7 @@ class EventLogger {
 
     @ConsumeEvent(DATA_ENRICHED_TOPIC)
     public Uni<Void> consume(DataEnriched event) {
-        return Uni.createFrom().item(() -> {
-            LOGGER.info(String.format(EVENT_CONSUMED_TEMPLATE, event.getClass().getSimpleName(), event.toString()));
-            return null;
-        });
+        return MutinyUtils.uniFromRunnable(() ->
+                LOGGER.info(String.format(EVENT_CONSUMED_TEMPLATE, event.getClass().getSimpleName(), event.toString())));
     }
 }

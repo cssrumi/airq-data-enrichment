@@ -12,24 +12,24 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class GiosEndpoint {
 
-    private final GiosDataService giosDataService;
+    private final GiosService giosService;
 
     @Inject
-    public GiosEndpoint(GiosDataService giosDataService) {
-        this.giosDataService = giosDataService;
+    public GiosEndpoint(GiosService giosService) {
+        this.giosService = giosService;
     }
 
     @GET
     @Path("/lastHour/installations")
     public Uni<Response> getAllInstallationsWithPMFromLastHour() {
-        return giosDataService.getInstallationsSinceLastHour()
-                              .map(installations -> Response.ok(installations).build());
+        return giosService.getInstallationsSinceLastHour()
+                          .map(installations -> Response.ok(installations).build());
     }
 
     @GET
     @Path("/lastHour/measurements")
     public Uni<Response> getAllMeasurementsWithPMFromLastHour() {
-        return giosDataService.getMeasurementsSinceLastHour()
-                              .map(installations -> Response.ok(installations).build());
+        return giosService.getMeasurementsSinceLastHour()
+                          .map(installations -> Response.ok(installations).build());
     }
 }

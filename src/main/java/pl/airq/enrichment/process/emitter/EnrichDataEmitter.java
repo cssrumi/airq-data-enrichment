@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.airq.common.domain.DataProvider;
 import pl.airq.common.process.AppEventBus;
-import pl.airq.enrichment.model.command.EnrichData;
-import pl.airq.enrichment.model.command.EnrichDataPayload;
+import pl.airq.enrichment.process.command.EnrichData;
+import pl.airq.enrichment.process.command.EnrichDataPayload;
 
 @ApplicationScoped
 class EnrichDataEmitter {

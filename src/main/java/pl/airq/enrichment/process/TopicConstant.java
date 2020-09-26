@@ -1,4 +1,4 @@
-package pl.airq.enrichment.model;
+package pl.airq.enrichment.process;
 
 public class TopicConstant {
 

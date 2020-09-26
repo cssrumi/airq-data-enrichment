@@ -1,4 +1,4 @@
-package pl.airq.enrichment.model.event;
+package pl.airq.enrichment.process.event;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.List;

@@ -1,9 +1,9 @@
-package pl.airq.enrichment.model.event;
+package pl.airq.enrichment.process.event;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import pl.airq.common.process.event.AppEvent;
 
-import static pl.airq.enrichment.model.TopicConstant.DATA_ENRICHED_TOPIC;
+import static pl.airq.enrichment.process.TopicConstant.DATA_ENRICHED_TOPIC;
 
 @RegisterForReflection
 public class DataEnriched extends AppEvent<DataEnrichedPayload> {

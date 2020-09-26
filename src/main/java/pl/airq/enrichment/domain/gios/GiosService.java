@@ -13,12 +13,12 @@ import pl.airq.common.domain.gios.installation.InstallationQuery;
 import static java.util.stream.Collectors.groupingBy;
 
 @ApplicationScoped
-public class GiosDataService {
+public class GiosService {
 
     private final InstallationQuery installationQuery;
 
     @Inject
-    public GiosDataService(InstallationQuery installationQuery) {
+    public GiosService(InstallationQuery installationQuery) {
         this.installationQuery = installationQuery;
     }
 

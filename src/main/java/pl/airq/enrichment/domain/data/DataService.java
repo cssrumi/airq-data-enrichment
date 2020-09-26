@@ -38,11 +38,9 @@ public class DataService {
 
     private Void checkResult(Boolean result) {
         if (Boolean.FALSE.equals(result)) {
-            LOGGER.error("Unable to save EnrichedData.");
             throw new RuntimeException("Unable to save EnrichedData.");
         }
 
-        LOGGER.debug("EnrichedData saved successfully");
         return null;
     }
 }
