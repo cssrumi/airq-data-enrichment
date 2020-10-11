@@ -15,7 +15,14 @@ import pl.airq.common.infrastructure.persistance.PersistentRepositoryPostgres;
 public class EnrichedDataRepositoryPostgres extends PersistentRepositoryPostgres<EnrichedData> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EnrichedDataRepositoryPostgres.class);
-    static final String INSERT_QUERY = "INSERT INTO ENRICHED_DATA (\"timestamp\", pm10, pm25, temperature, wind, winddirection, humidity, pressure, lon, lat, provider, station) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)";
+    static final String ON_CONFLICT_UPDATE_PART = " ON CONFLICT (\"timestamp\", station) DO UPDATE SET" +
+            " pm10 = EXCLUDED.pm10, pm25 = EXCLUDED.pm25, temperature = EXCLUDED.temperature, wind = EXCLUDED.wind," +
+            " winddirection = EXCLUDED.winddirection, humidity = EXCLUDED.humidity, pressure = EXCLUDED.pressure," +
+            " lon = EXCLUDED.lon, lat = EXCLUDED.lat, provider = EXCLUDED.provider";
+    static final String INSERT_QUERY = "INSERT INTO ENRICHED_DATA" +
+            " (\"timestamp\", pm10, pm25, temperature, wind, winddirection, humidity, pressure, lon, lat, provider, station)" +
+            " VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)";
+    static final String UPSERT_QUERY = INSERT_QUERY + ON_CONFLICT_UPDATE_PART;
 
     @Inject
     public EnrichedDataRepositoryPostgres(PgPool client) {
@@ -25,6 +32,11 @@ public class EnrichedDataRepositoryPostgres extends PersistentRepositoryPostgres
     @Override
     protected String insertQuery() {
         return INSERT_QUERY;
+    }
+
+    @Override
+    protected String upsertQuery() {
+        return UPSERT_QUERY;
     }
 
     @Override
@@ -40,11 +52,15 @@ public class EnrichedDataRepositoryPostgres extends PersistentRepositoryPostgres
                     .addFloat(enrichedData.lon)
                     .addFloat(enrichedData.lat)
                     .addString(enrichedData.provider.name())
-                    .addString(enrichedData.station.getId());
+                    .addString(enrichedData.station.value());
     }
 
     @Override
     protected void postSaveAction(RowSet<Row> saveResult) {
+    }
+
+    @Override
+    protected void postUpsertAction(RowSet<Row> upsertResult) {
     }
 
     @Override

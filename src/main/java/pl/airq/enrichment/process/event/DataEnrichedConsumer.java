@@ -33,7 +33,7 @@ class DataEnrichedConsumer {
         return Multi.createFrom()
                     .iterable(AirqDataEnrichedEventFactory.from(event))
                     .onItem().transform(parser::parse)
-                    .onItem().invoke(rawEvent -> Multi.createFrom().completionStage(externalTopic.send(rawEvent)))
+                    .onItem().invokeUni(rawEvent -> Uni.createFrom().completionStage(externalTopic.send(rawEvent)))
                     .collectItems().asList()
                     .onItem().transform(List::size)
                     .onItem().transform(size -> {
