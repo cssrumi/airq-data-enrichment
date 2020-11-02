@@ -25,9 +25,9 @@ import pl.airq.common.process.event.AirqEvent;
 import pl.airq.enrichment.domain.data.DataService;
 import pl.airq.enrichment.domain.data.MockEnrichedDataRepositoryPostgres;
 import pl.airq.enrichment.process.emitter.EnrichDataEmitterPublicProxy;
-import pl.airq.enrichment.weather.CurrentWeatherInfo;
+import pl.airq.enrichment.weather.WeatherInfo;
 import pl.airq.enrichment.weather.CurrentWeatherInfoFactory;
-import pl.airq.enrichment.weather.WeatherService;
+import pl.airq.enrichment.weather.WeatherClient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,7 +48,7 @@ class IntegrationTest {
     @InjectMock
     private InstallationQuery installationQuery;
     @InjectMock
-    private WeatherService weatherService;
+    private WeatherClient weatherClient;
 
     @Inject
     private EnrichDataEmitterPublicProxy enrichDataEmitter;
@@ -68,9 +68,9 @@ class IntegrationTest {
         final Installation pm10Installation = installationWithPm10(id, pm10);
         final Installation pm25Installation = installationWithPm25(id, pm25);
         final Set<Installation> installations = Set.of(pm10Installation, pm25Installation);
-        final CurrentWeatherInfo weatherInfo = CurrentWeatherInfoFactory.random();
+        final WeatherInfo weatherInfo = CurrentWeatherInfoFactory.random();
 
-        when(weatherService.getCurrentWeatherInfoByCoordinates(anyString(), anyString()))
+        when(weatherClient.getCurrentWeatherInfoByCoordinates(anyString(), anyString()))
                 .thenReturn(Uni.createFrom().item(weatherInfo));
         when(installationQuery.getAllWithPMSinceLastHour())
                 .thenReturn(Uni.createFrom().item(installations));
@@ -92,7 +92,7 @@ class IntegrationTest {
         assertEquals(weatherInfo.humidity, result.humidity);
         assertEquals(weatherInfo.pressure, result.pressure);
         verify(dataService, times(1)).enrichGiosData(any());
-        verify(weatherService, times(1)).getCurrentWeatherInfoByCoordinates(any(), any());
+        verify(weatherClient, times(1)).getCurrentWeatherInfoByCoordinates(any(), any());
     }
 
     @Dependent

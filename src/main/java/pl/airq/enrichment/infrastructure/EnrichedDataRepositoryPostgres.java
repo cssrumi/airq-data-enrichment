@@ -1,15 +1,17 @@
-package pl.airq.enrichment.domain.data;
+package pl.airq.enrichment.infrastructure;
 
+import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.pgclient.PgPool;
-import io.vertx.mutiny.sqlclient.Row;
-import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.airq.common.domain.enriched.EnrichedData;
 import pl.airq.common.infrastructure.persistance.PersistentRepositoryPostgres;
+import pl.airq.common.process.AppEventBus;
+import pl.airq.enrichment.process.DataEnrichedPublisher;
 
 @Singleton
 public class EnrichedDataRepositoryPostgres extends PersistentRepositoryPostgres<EnrichedData> {
@@ -24,9 +26,12 @@ public class EnrichedDataRepositoryPostgres extends PersistentRepositoryPostgres
             " VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)";
     static final String UPSERT_QUERY = INSERT_QUERY + ON_CONFLICT_UPDATE_PART;
 
+    private final DataEnrichedPublisher publisher;
+
     @Inject
-    public EnrichedDataRepositoryPostgres(PgPool client) {
+    public EnrichedDataRepositoryPostgres(PgPool client, DataEnrichedPublisher publisher) {
         super(client);
+        this.publisher = publisher;
     }
 
     @Override
@@ -56,20 +61,17 @@ public class EnrichedDataRepositoryPostgres extends PersistentRepositoryPostgres
     }
 
     @Override
-    protected void postSaveAction(RowSet<Row> saveResult) {
+    protected Uni<Void> postProcessAction(Action action, Boolean result, EnrichedData data) {
+        return Uni.createFrom().voidItem()
+                  .invoke(() -> logResult(action, result, data));
     }
 
-    @Override
-    protected void postUpsertAction(RowSet<Row> upsertResult) {
-    }
-
-    @Override
-    protected void postProcessAction(Boolean result, EnrichedData data) {
+    private void logResult(Action action, Boolean result, EnrichedData data) {
         if (Boolean.TRUE.equals(result)) {
-            LOGGER.info("EnrichedData saved successfully.");
+            LOGGER.info("{} completed.", action);
             return;
         }
 
-        LOGGER.warn("Unable to save EnrichedData: " + data);
+        LOGGER.warn("Unable to perform {} for {}", action, data);
     }
 }

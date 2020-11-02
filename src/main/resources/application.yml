@@ -1,14 +1,6 @@
 quarkus:
   application:
     name: data-enrichment
-  cache:
-    caffeine:
-      "CurrentWeatherByCityAndCountry":
-        expire-after-write: 30M
-      "CurrentWeatherByCityInPoland":
-        expire-after-write: 30M
-      "CurrentWeatherByCoordinates":
-        expire-after-write: 30M
   datasource:
     db-kind: postgresql
     username: postgres
@@ -23,10 +15,20 @@ quarkus:
 
 mp:
   messaging:
+    incoming:
+      gios-measurement:
+        connector: smallrye-kafka
+        topic: gios.measurement
+        key:
+          deserializer: pl.airq.common.kafka.TSKeyDeserializer
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
     outgoing:
       data-enriched:
         connector: smallrye-kafka
         topic: data.enriched
+        key:
+          serializer: pl.airq.common.kafka.TSKeySerializer
         value:
           serializer: org.apache.kafka.common.serialization.StringSerializer
 
@@ -36,22 +38,14 @@ kafka:
   bootstrap:
     servers: 10.1.1.51:9092
 
-data-enrichment:
-  emitter:
-    cron: 0 20 * * * ?
-  open-weather:
-    api/mp-rest/url: https://api.openweathermap.org/data
-    api/mp-rest/scope: javax.inject.Singleton
-
 "%dev":
   quarkus:
     http:
       port: 8090
-
-"%test":
-  quarkus:
-    scheduler:
-      enabled: false
   data-enrichment:
-    open-weather:
-      api-key: any
+    weather:
+      host:
+      port: 8096
+      ssl: false
+  bootstrap:
+    servers: localhost:9092

@@ -1,4 +1,4 @@
-package pl.airq.enrichment.domain.gios;
+package pl.airq.enrichment.process.gios;
 
 import pl.airq.common.domain.gios.installation.Installation;
 

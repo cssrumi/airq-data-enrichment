@@ -4,6 +4,7 @@ import io.quarkus.test.Mock;
 import io.smallrye.mutiny.Uni;
 import javax.enterprise.context.ApplicationScoped;
 import pl.airq.common.domain.enriched.EnrichedData;
+import pl.airq.enrichment.infrastructure.EnrichedDataRepositoryPostgres;
 
 @Mock
 @ApplicationScoped
@@ -12,7 +13,7 @@ public class MockEnrichedDataRepositoryPostgres extends EnrichedDataRepositoryPo
     private Boolean result = Boolean.TRUE;
 
     public MockEnrichedDataRepositoryPostgres() {
-        super(null);
+        super(null, bus);
     }
 
     @Override

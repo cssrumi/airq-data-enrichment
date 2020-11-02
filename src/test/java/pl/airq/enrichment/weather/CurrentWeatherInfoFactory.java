@@ -7,8 +7,8 @@ public class CurrentWeatherInfoFactory {
     private CurrentWeatherInfoFactory() {
     }
 
-    public static CurrentWeatherInfo random() {
-        return new CurrentWeatherInfo(
+    public static WeatherInfo random() {
+        return new WeatherInfo(
                 RandomUtils.nextFloat(),
                 RandomUtils.nextFloat(),
                 RandomUtils.nextFloat(),
