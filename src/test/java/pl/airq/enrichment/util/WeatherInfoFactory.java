@@ -1,10 +1,11 @@
-package pl.airq.enrichment.weather;
+package pl.airq.enrichment.util;
 
 import org.apache.commons.lang3.RandomUtils;
+import pl.airq.enrichment.weather.WeatherInfo;
 
-public class CurrentWeatherInfoFactory {
+public class WeatherInfoFactory {
 
-    private CurrentWeatherInfoFactory() {
+    private WeatherInfoFactory() {
     }
 
     public static WeatherInfo random() {

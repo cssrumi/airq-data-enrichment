@@ -6,6 +6,9 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.inject.Singleton;
 import pl.airq.common.process.EventParser;
+import pl.airq.common.process.ctx.enriched.EnrichedDataCreatedEvent;
+import pl.airq.common.process.ctx.enriched.EnrichedDataDeletedEvent;
+import pl.airq.common.process.ctx.enriched.EnrichedDataUpdatedEvent;
 import pl.airq.common.process.ctx.gios.aggragation.GiosMeasurementCreatedEvent;
 import pl.airq.common.process.ctx.gios.aggragation.GiosMeasurementDeletedEvent;
 import pl.airq.common.process.ctx.gios.aggragation.GiosMeasurementUpdatedEvent;
@@ -23,7 +26,10 @@ class EventParserProducer {
         eventParser.registerEvents(Set.of(
                 GiosMeasurementCreatedEvent.class,
                 GiosMeasurementUpdatedEvent.class,
-                GiosMeasurementDeletedEvent.class
+                GiosMeasurementDeletedEvent.class,
+                EnrichedDataCreatedEvent.class,
+                EnrichedDataUpdatedEvent.class,
+                EnrichedDataDeletedEvent.class
         ));
         return eventParser;
     }

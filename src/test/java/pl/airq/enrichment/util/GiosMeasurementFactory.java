@@ -1,6 +1,8 @@
-package pl.airq.enrichment.process.gios;
+package pl.airq.enrichment.util;
 
-import pl.airq.common.domain.gios.installation.Installation;
+
+import pl.airq.common.domain.gios.GiosMeasurement;
+import pl.airq.common.domain.gios.Installation;
 
 public class GiosMeasurementFactory {
 

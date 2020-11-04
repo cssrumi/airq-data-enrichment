@@ -8,8 +8,6 @@ quarkus:
       url: jdbc:postgresql://10.1.1.50:5432/warehouse
     reactive:
       url: postgresql://10.1.1.50:5432/warehouse
-  native:
-    additional-build-args: -H:ReflectionConfigurationFiles=reflection-config.json
   vertx:
     prefer-native-transport: true
 
@@ -49,3 +47,10 @@ kafka:
       ssl: false
   bootstrap:
     servers: localhost:9092
+
+"%test":
+  data-enrichment:
+    weather:
+      host: localhost
+      port: 9999
+      ssl: false

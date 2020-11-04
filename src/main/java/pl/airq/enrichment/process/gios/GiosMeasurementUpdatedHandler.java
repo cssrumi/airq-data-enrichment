@@ -3,6 +3,7 @@ package pl.airq.enrichment.process.gios;
 import io.smallrye.mutiny.Uni;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import pl.airq.common.domain.PersistentRepository;
 import pl.airq.common.domain.enriched.EnrichedData;
 import pl.airq.common.domain.enriched.EnrichedDataQuery;
 import pl.airq.common.domain.gios.GiosMeasurement;
@@ -11,7 +12,7 @@ import pl.airq.common.process.event.AirqEvent;
 import pl.airq.common.store.key.TSKey;
 import pl.airq.enrichment.domain.DataEnricherService;
 import pl.airq.enrichment.infrastructure.EnrichedDataRepositoryPostgres;
-import pl.airq.enrichment.process.DataEnrichedPublisher;
+import pl.airq.enrichment.process.EnrichedDataPublisher;
 
 @ApplicationScoped
 class GiosMeasurementUpdatedHandler {
@@ -19,13 +20,13 @@ class GiosMeasurementUpdatedHandler {
     private final DataEnricherService dataEnricherService;
     private final EnrichedDataRepositoryPostgres repository;
     private final EnrichedDataQuery query;
-    private final DataEnrichedPublisher publisher;
+    private final EnrichedDataPublisher publisher;
 
     @Inject
     GiosMeasurementUpdatedHandler(DataEnricherService dataEnricherService,
                                   EnrichedDataRepositoryPostgres repository,
                                   EnrichedDataQuery query,
-                                  DataEnrichedPublisher publisher) {
+                                  EnrichedDataPublisher publisher) {
         this.dataEnricherService = dataEnricherService;
         this.repository = repository;
         this.query = query;
@@ -58,6 +59,7 @@ class GiosMeasurementUpdatedHandler {
 
     private Uni<Boolean> upsertAndPublish(TSKey key, EnrichedData data) {
         return repository.upsert(data)
-                         .call(() -> publisher.updated(key, data));
+                         .call(result -> publisher.from(result, key, data))
+                         .map(PersistentRepository.Result::isSuccess);
     }
 }

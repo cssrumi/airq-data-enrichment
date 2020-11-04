@@ -1,10 +1,10 @@
-package pl.airq.enrichment.domain;
+package pl.airq.enrichment.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.OffsetDateTime;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
-import pl.airq.common.domain.gios.installation.Installation;
+import pl.airq.common.domain.gios.Installation;
 
 import static org.junit.jupiter.api.Assertions.fail;
 

@@ -8,6 +8,7 @@ import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.web.client.HttpResponse;
 import io.vertx.mutiny.ext.web.client.WebClient;
 import java.time.OffsetDateTime;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import pl.airq.common.vo.StationId;
 import pl.airq.enrichment.config.DataEnrichmentProperties;
 import pl.airq.enrichment.weather.dto.WeatherInfoRequest;
 
+@ApplicationScoped
 public class WeatherClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WeatherClient.class);

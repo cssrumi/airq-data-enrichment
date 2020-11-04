@@ -1,11 +1,15 @@
 package pl.airq.enrichment.process.gios;
 
 import io.smallrye.mutiny.Uni;
-import io.smallrye.reactive.messaging.kafka.KafkaMessageMetadata;
+import io.smallrye.reactive.messaging.kafka.IncomingKafkaRecord;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import org.apache.commons.lang3.BooleanUtils;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
+import org.eclipse.microprofile.reactive.messaging.OnOverflow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pl.airq.common.process.EventParser;
 import pl.airq.common.process.MutinyUtils;
 import pl.airq.common.process.ctx.gios.aggragation.GiosMeasurementEventPayload;
@@ -14,6 +18,8 @@ import pl.airq.common.store.key.TSKey;
 
 @ApplicationScoped
 class GiosMeasurementEventConsumer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GiosMeasurementEventConsumer.class);
 
     private final EventParser parser;
     private final GiosMeasurementDispatcher dispatcher;
@@ -24,21 +30,28 @@ class GiosMeasurementEventConsumer {
         this.dispatcher = dispatcher;
     }
 
-    @Incoming("gios-measurement")
     @SuppressWarnings("unchecked")
+    @OnOverflow(value = OnOverflow.Strategy.BUFFER, bufferSize = 10)
+    @Incoming("gios-measurement")
     Uni<Void> consume(Message<String> message) {
         return Uni.createFrom().item(parser.deserializeDomainEvent(message.getPayload()))
-                  .onItem().transformToUni(event -> dispatchAndPublish(getKey(message), event));
+                  .invoke(airqEvent -> LOGGER.info("AirqEvent arrived: {}, key: {}", airqEvent, getKey(message).value()))
+                  .flatMap(event -> dispatch(TSKey.from(((GiosMeasurementEventPayload) event.payload).measurement), event));
     }
 
     @SuppressWarnings("unchecked")
     private TSKey getKey(Message<String> message) {
-        return ((KafkaMessageMetadata<TSKey>) message.unwrap(KafkaMessageMetadata.class)).getKey();
+        return ((IncomingKafkaRecord<TSKey, String>) message.unwrap(IncomingKafkaRecord.class)).getKey();
     }
 
-    private Uni<Void> dispatchAndPublish(TSKey key, AirqEvent<GiosMeasurementEventPayload> event) {
+    private Uni<Void> dispatch(TSKey key, AirqEvent<GiosMeasurementEventPayload> event) {
         return dispatcher.dispatch(key, event)
+                         .invoke(result -> LOGGER.info("Dispatched: {} - {}. Status: {}", key.value(), event.eventType(), status(result)))
                          .onItem().transformToUni(MutinyUtils::ignoreUniResult);
+    }
+
+    private String status(Boolean result) {
+        return BooleanUtils.isNotTrue(result) ? "Failure" : "Success";
     }
 
 }

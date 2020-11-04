@@ -8,7 +8,7 @@ import pl.airq.common.process.ctx.enriched.EnrichedDataEventPayload;
 import pl.airq.common.process.ctx.enriched.EnrichedDataUpdatedEvent;
 import pl.airq.common.process.event.AirqEvent;
 
-class DataEnrichedEventFactory {
+class EnrichedDataEventFactory {
 
     static AirqEvent<EnrichedDataEventPayload> create(EnrichedData data) {
         return new EnrichedDataCreatedEvent(OffsetDateTime.now(), new EnrichedDataEventPayload(data));
