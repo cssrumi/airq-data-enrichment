@@ -30,6 +30,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.awaitility.core.ConditionTimeoutException;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -48,19 +49,24 @@ import pl.airq.common.kafka.TSKeyDeserializer;
 import pl.airq.common.kafka.TSKeySerializer;
 import pl.airq.common.process.EventParser;
 import pl.airq.common.process.ctx.enriched.EnrichedDataCreatedEvent;
+import pl.airq.common.process.ctx.enriched.EnrichedDataDeletedEvent;
 import pl.airq.common.process.ctx.enriched.EnrichedDataEventPayload;
 import pl.airq.common.process.ctx.enriched.EnrichedDataUpdatedEvent;
 import pl.airq.common.process.ctx.gios.aggragation.GiosMeasurementCreatedEvent;
+import pl.airq.common.process.ctx.gios.aggragation.GiosMeasurementDeletedEvent;
 import pl.airq.common.process.ctx.gios.aggragation.GiosMeasurementEventPayload;
+import pl.airq.common.process.ctx.gios.aggragation.GiosMeasurementUpdatedEvent;
 import pl.airq.common.process.event.AirqEvent;
 import pl.airq.common.store.key.TSKey;
 import pl.airq.common.vo.StationId;
 import pl.airq.common.vo.StationLocation;
+import pl.airq.enrichment.domain.DataEnricherService;
 import pl.airq.enrichment.util.WeatherInfoFactory;
 import pl.airq.enrichment.weather.WeatherClient;
 import pl.airq.enrichment.weather.WeatherInfo;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -88,6 +94,8 @@ class IntegrationTest {
     PersistentRepository<EnrichedData> repository;
     @Inject
     EnrichedDataQuery query;
+    @Inject
+    DataEnricherService service;
     @Inject
     KafkaProducer<TSKey, AirqEvent<GiosMeasurementEventPayload>> producer;
     @Inject
@@ -126,7 +134,7 @@ class IntegrationTest {
     }
 
     @Test
-    void repository() {
+    void withUpsertedData_expectDataFromQuery() {
         Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
         WeatherInfo weatherInfo = WeatherInfoFactory.random();
         GiosMeasurement measurement = new GiosMeasurement(OffsetDateTime.now(), station, 1.0f, 2.0f);
@@ -150,7 +158,6 @@ class IntegrationTest {
                                         .await().atMost(Duration.ofSeconds(10));
 
         assertThat(result).isNotNull();
-        System.out.println(result);
     }
 
     @Test
@@ -173,7 +180,65 @@ class IntegrationTest {
     }
 
     @Test
-    void with2GiosMeasurementCreatedWithDifferentPm10Value_expectEnrichedDataCreatedEvent() {
+    void withGiosMeasurementUpdated_expectEnrichedDataCreatedEvent() {
+        Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
+        final OffsetDateTime measurementTimestamp = currentTimestamp();
+        GiosMeasurement measurement = new GiosMeasurement(measurementTimestamp, station, 1.0f, 2.0f);
+        GiosMeasurementEventPayload updatedPayload = new GiosMeasurementEventPayload(measurement);
+        GiosMeasurementUpdatedEvent updatedEvent = new GiosMeasurementUpdatedEvent(OffsetDateTime.now(), updatedPayload);
+
+        WeatherInfo weatherInfo = WeatherInfoFactory.random();
+        when(weatherClient.getWeatherInfo(any(StationId.class), any(OffsetDateTime.class))).thenReturn(Uni.createFrom().item(weatherInfo));
+
+        TSKey updatedKey = sendEvent(updatedEvent);
+        AirqEvent<EnrichedDataEventPayload> receivedEvent = awaitForEvent(updatedKey);
+
+        verifyEnrichedDataCount(1);
+        verifyEnrichedDataEvent(receivedEvent, EnrichedDataCreatedEvent.class, weatherInfo, measurement);
+        verifyEnrichedDataInDB(weatherInfo, measurement);
+    }
+
+    @Test
+    void withGiosMeasurementDeletedAndValueStored_expectEnrichedDataDeletedEvent() {
+        Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
+        final OffsetDateTime measurementTimestamp = currentTimestamp();
+        GiosMeasurement measurement = new GiosMeasurement(measurementTimestamp, station, 1.0f, 2.0f);
+        GiosMeasurementEventPayload deletedPayload = new GiosMeasurementEventPayload(measurement);
+        GiosMeasurementDeletedEvent deletedEvent = new GiosMeasurementDeletedEvent(OffsetDateTime.now(), deletedPayload);
+
+        WeatherInfo weatherInfo = WeatherInfoFactory.random();
+        when(weatherClient.getWeatherInfo(any(StationId.class), any(OffsetDateTime.class))).thenReturn(Uni.createFrom().item(weatherInfo));
+
+        service.enrichGiosMeasurement(measurement)
+               .flatMap(repository::save)
+               .await().atMost(Duration.ofSeconds(2));
+
+        TSKey deletedKey = sendEvent(deletedEvent);
+        AirqEvent<EnrichedDataEventPayload> receivedEvent = awaitForEvent(deletedKey);
+
+        verifyEnrichedDataCount(0);
+        assertThat(eventsMap).hasSize(1).containsKey(deletedKey);
+        assertThat(receivedEvent).isInstanceOf(EnrichedDataDeletedEvent.class);
+    }
+
+    @Test
+    void withGiosMeasurementDeletedAndValueNotStored_expectConditionTimeoutException() {
+        Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
+        final OffsetDateTime measurementTimestamp = currentTimestamp();
+        GiosMeasurement measurement = new GiosMeasurement(measurementTimestamp, station, 1.0f, 2.0f);
+        GiosMeasurementEventPayload deletedPayload = new GiosMeasurementEventPayload(measurement);
+        GiosMeasurementDeletedEvent deletedEvent = new GiosMeasurementDeletedEvent(OffsetDateTime.now(), deletedPayload);
+
+        TSKey deletedKey = sendEvent(deletedEvent);
+
+        assertThatThrownBy(() -> awaitForEvent(deletedKey))
+                .isInstanceOf(ConditionTimeoutException.class);
+
+        verifyEnrichedDataCount(0);
+    }
+
+    @Test
+    void with2GiosMeasurementCreatedWithDifferentPm10Value_expectEnrichedDataCreatedAndUpdatedEvent() {
         Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
         final OffsetDateTime measurementTimestamp = currentTimestamp();
         GiosMeasurement measurement = new GiosMeasurement(measurementTimestamp, station, 1.0f, 2.0f);
@@ -199,6 +264,39 @@ class IntegrationTest {
         AirqEvent<EnrichedDataEventPayload> receivedEvent2 = awaitForEvent(createdKeyWithDifferentPm10);
 
         assertThat(createdKey).isEqualTo(createdKeyWithDifferentPm10).isNotNull();
+        verifyEnrichedDataCount(1);
+        verifyEnrichedDataEvent(receivedEvent1, EnrichedDataCreatedEvent.class, weatherInfo, measurement);
+        verifyEnrichedDataEvent(receivedEvent2, EnrichedDataUpdatedEvent.class, weatherInfo, measurementWithDifferentPm10);
+        verifyEnrichedDataInDB(weatherInfo, measurementWithDifferentPm10);
+    }
+
+    @Test
+    void withGiosMeasurementCreatedAndUpdatedWithDifferentPm10Value_expectEnrichedDataCreatedAndUpdatedEvent() {
+        Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
+        final OffsetDateTime measurementTimestamp = currentTimestamp();
+        GiosMeasurement measurement = new GiosMeasurement(measurementTimestamp, station, 1.0f, 2.0f);
+        GiosMeasurement measurementWithDifferentPm10 = new GiosMeasurement(measurementTimestamp, station, 11.0f, 2.0f);
+        GiosMeasurementEventPayload createdPayload = new GiosMeasurementEventPayload(measurement);
+        GiosMeasurementEventPayload updatedPayload = new GiosMeasurementEventPayload(measurementWithDifferentPm10);
+        GiosMeasurementCreatedEvent createdEvent = new GiosMeasurementCreatedEvent(
+                OffsetDateTime.now(),
+                createdPayload
+        );
+        GiosMeasurementUpdatedEvent updatedEvent = new GiosMeasurementUpdatedEvent(
+                OffsetDateTime.now(),
+                updatedPayload
+        );
+
+        WeatherInfo weatherInfo = WeatherInfoFactory.random();
+        when(weatherClient.getWeatherInfo(any(StationId.class), any(OffsetDateTime.class))).thenReturn(Uni.createFrom().item(weatherInfo));
+
+        TSKey createdKey = sendEvent(createdEvent);
+        AirqEvent<EnrichedDataEventPayload> receivedEvent1 = awaitForEvent(createdKey);
+
+        TSKey updatedKey = sendEvent(updatedEvent);
+        AirqEvent<EnrichedDataEventPayload> receivedEvent2 = awaitForEvent(updatedKey);
+
+        assertThat(createdKey).isEqualTo(updatedKey).isNotNull();
         verifyEnrichedDataCount(1);
         verifyEnrichedDataEvent(receivedEvent1, EnrichedDataCreatedEvent.class, weatherInfo, measurement);
         verifyEnrichedDataEvent(receivedEvent2, EnrichedDataUpdatedEvent.class, weatherInfo, measurementWithDifferentPm10);
@@ -236,9 +334,7 @@ class IntegrationTest {
 
     private void verifyEnrichedDataInDB(WeatherInfo weatherInfo, GiosMeasurement measurement) {
         EnrichedData enrichedData = query.findByStationAndTimestamp(measurement.station.id.value(), measurement.timestamp)
-                                         .await().atMost(Duration.ofSeconds(5));
-
-        System.out.println(enrichedData);
+                                         .await().atMost(Duration.ofSeconds(2));
 
         verifyEnrichedData(enrichedData, weatherInfo, measurement);
     }
@@ -264,7 +360,6 @@ class IntegrationTest {
 
     private void verifyEnrichedDataCount(int value) {
         Set<EnrichedData> data = query.findAll().await().atMost(Duration.ofSeconds(2));
-        System.out.println(data);
         assertThat(data).hasSize(value);
     }
 

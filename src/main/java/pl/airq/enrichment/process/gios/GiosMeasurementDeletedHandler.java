@@ -25,6 +25,6 @@ class GiosMeasurementDeletedHandler {
 
     Uni<Boolean> handle(TSKey key, AirqEvent<GiosMeasurementEventPayload> giosMeasurementEvent) {
         return removable.removeByKey(key)
-                        .call(() -> publisher.deleted(key));
+                        .call(isSuccess -> isSuccess ? publisher.deleted(key) : Uni.createFrom().voidItem());
     }
 }
