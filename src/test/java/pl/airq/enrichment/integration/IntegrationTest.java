@@ -292,14 +292,14 @@ class IntegrationTest {
 
         TSKey createdKey = sendEvent(createdEvent);
         AirqEvent<EnrichedDataEventPayload> receivedEvent1 = awaitForEvent(createdKey);
+        verifyEnrichedDataEvent(receivedEvent1, EnrichedDataCreatedEvent.class, weatherInfo, measurement);
 
         TSKey updatedKey = sendEvent(updatedEvent);
         AirqEvent<EnrichedDataEventPayload> receivedEvent2 = awaitForEvent(updatedKey);
+        verifyEnrichedDataEvent(receivedEvent2, EnrichedDataUpdatedEvent.class, weatherInfo, measurementWithDifferentPm10);
 
         assertThat(createdKey).isEqualTo(updatedKey).isNotNull();
         verifyEnrichedDataCount(1);
-        verifyEnrichedDataEvent(receivedEvent1, EnrichedDataCreatedEvent.class, weatherInfo, measurement);
-        verifyEnrichedDataEvent(receivedEvent2, EnrichedDataUpdatedEvent.class, weatherInfo, measurementWithDifferentPm10);
         verifyEnrichedDataInDB(weatherInfo, measurementWithDifferentPm10);
     }
 
@@ -364,7 +364,7 @@ class IntegrationTest {
     }
 
     @Dependent
-    static class KafkaConsumerConfiguration {
+    static class KafkaTestConfiguration {
 
         @ConfigProperty(name = "kafka.bootstrap.servers")
         String bootstrapServers;
