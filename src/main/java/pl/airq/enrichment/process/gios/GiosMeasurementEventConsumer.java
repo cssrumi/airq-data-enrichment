@@ -36,7 +36,7 @@ class GiosMeasurementEventConsumer {
     Uni<Void> consume(Message<String> message) {
         return Uni.createFrom().item(parser.deserializeDomainEvent(message.getPayload()))
                   .invoke(airqEvent -> LOGGER.info("AirqEvent arrived: {}, key: {}", airqEvent, getKey(message).value()))
-                  .flatMap(event -> dispatch(TSKey.from(((GiosMeasurementEventPayload) event.payload).measurement), event));
+                  .flatMap(event -> dispatch(getKey(message), event));
     }
 
     @SuppressWarnings("unchecked")
