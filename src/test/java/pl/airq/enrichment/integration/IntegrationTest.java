@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
@@ -79,6 +80,7 @@ import static pl.airq.enrichment.integration.DBConstant.DROP_ENRICHED_DATA_TABLE
 @QuarkusTest
 class IntegrationTest {
 
+    private static final AtomicInteger STATION_NUMBER = new AtomicInteger(0);
     private static final StationLocation FIXED_STATION_LOCATION = StationLocation.from(1.0f, 2.0f);
     private final Map<TSKey, AirqEvent<EnrichedDataEventPayload>> eventsMap = new ConcurrentHashMap<>();
     private final List<AirqEvent<EnrichedDataEventPayload>> eventsList = new CopyOnWriteArrayList<>();
@@ -135,7 +137,7 @@ class IntegrationTest {
 
     @Test
     void withUpsertedData_expectDataFromQuery() {
-        Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
+        Station station = new Station(stationId(), FIXED_STATION_LOCATION);
         WeatherInfo weatherInfo = WeatherInfoFactory.random();
         GiosMeasurement measurement = new GiosMeasurement(OffsetDateTime.now(), station, 1.0f, 2.0f);
         EnrichedData enrichedData = new EnrichedData(
@@ -162,7 +164,7 @@ class IntegrationTest {
 
     @Test
     void withGiosMeasurementCreated_expectEnrichedDataCreatedEvent() {
-        Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
+        Station station = new Station(stationId(), FIXED_STATION_LOCATION);
         final OffsetDateTime measurementTimestamp = currentTimestamp();
         GiosMeasurement measurement = new GiosMeasurement(measurementTimestamp, station, 1.0f, 2.0f);
         GiosMeasurementEventPayload createdPayload = new GiosMeasurementEventPayload(measurement);
@@ -181,7 +183,7 @@ class IntegrationTest {
 
     @Test
     void withGiosMeasurementUpdated_expectEnrichedDataCreatedEvent() {
-        Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
+        Station station = new Station(stationId(), FIXED_STATION_LOCATION);
         final OffsetDateTime measurementTimestamp = currentTimestamp();
         GiosMeasurement measurement = new GiosMeasurement(measurementTimestamp, station, 1.0f, 2.0f);
         GiosMeasurementEventPayload updatedPayload = new GiosMeasurementEventPayload(measurement);
@@ -200,7 +202,7 @@ class IntegrationTest {
 
     @Test
     void withGiosMeasurementDeletedAndValueStored_expectEnrichedDataDeletedEvent() {
-        Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
+        Station station = new Station(stationId(), FIXED_STATION_LOCATION);
         final OffsetDateTime measurementTimestamp = currentTimestamp();
         GiosMeasurement measurement = new GiosMeasurement(measurementTimestamp, station, 1.0f, 2.0f);
         GiosMeasurementEventPayload deletedPayload = new GiosMeasurementEventPayload(measurement);
@@ -223,7 +225,7 @@ class IntegrationTest {
 
     @Test
     void withGiosMeasurementDeletedAndValueNotStored_expectConditionTimeoutException() {
-        Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
+        Station station = new Station(stationId(), FIXED_STATION_LOCATION);
         final OffsetDateTime measurementTimestamp = currentTimestamp();
         GiosMeasurement measurement = new GiosMeasurement(measurementTimestamp, station, 1.0f, 2.0f);
         GiosMeasurementEventPayload deletedPayload = new GiosMeasurementEventPayload(measurement);
@@ -239,7 +241,7 @@ class IntegrationTest {
 
     @Test
     void with2GiosMeasurementCreatedWithDifferentPm10Value_expectEnrichedDataCreatedAndUpdatedEvent() {
-        Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
+        Station station = new Station(stationId(), FIXED_STATION_LOCATION);
         final OffsetDateTime measurementTimestamp = currentTimestamp();
         GiosMeasurement measurement = new GiosMeasurement(measurementTimestamp, station, 1.0f, 2.0f);
         GiosMeasurement measurementWithDifferentPm10 = new GiosMeasurement(measurementTimestamp, station, 11.0f, 2.0f);
@@ -274,7 +276,7 @@ class IntegrationTest {
 
     @Test
     void withGiosMeasurementCreatedAndUpdatedWithDifferentPm10Value_expectEnrichedDataCreatedAndUpdatedEvent() {
-        Station station = new Station(StationId.from("Station"), FIXED_STATION_LOCATION);
+        Station station = new Station(stationId(), FIXED_STATION_LOCATION);
         final OffsetDateTime measurementTimestamp = currentTimestamp();
         GiosMeasurement measurement = new GiosMeasurement(measurementTimestamp, station, 1.0f, 2.0f);
         GiosMeasurement measurementWithDifferentPm10 = new GiosMeasurement(measurementTimestamp, station, 11.0f, 2.0f);
@@ -363,6 +365,10 @@ class IntegrationTest {
     private void verifyEnrichedDataCount(int value) {
         Set<EnrichedData> data = query.findAll().await().atMost(Duration.ofSeconds(2));
         assertThat(data).hasSize(value);
+    }
+
+    private StationId stationId() {
+        return StationId.from("Station" + STATION_NUMBER.incrementAndGet());
     }
 
     private void sleep(Duration duration) {
