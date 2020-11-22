@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import pl.airq.common.vo.StationId;
 import pl.airq.enrichment.config.DataEnrichmentProperties;
 import pl.airq.enrichment.weather.dto.WeatherInfoRequest;
+import pl.airq.enrichment.weather.dto.WeatherInfoResponse;
 
 @ApplicationScoped
 public class WeatherClient {
@@ -37,19 +38,20 @@ public class WeatherClient {
     public Uni<WeatherInfo> getWeatherInfo(StationId stationId, OffsetDateTime timestamp) {
         return client.post("/v1/weather/info")
                      .sendJson(WeatherInfoRequest.from(timestamp, stationId))
-                     .map(this::deserialize);
+                     .map(this::deserialize)
+                     .map(weatherInfoResponse -> weatherInfoResponse.weatherInfo);
     }
 
-    private WeatherInfo deserialize(HttpResponse<?> response) {
+    private WeatherInfoResponse deserialize(HttpResponse<?> response) {
         final Response.Status status = Response.Status.fromStatusCode(response.statusCode());
         if (!status.getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
             LOGGER.warn("Unhandled status: {}", status);
             throw new RuntimeException(String.format("Unhandled status: %s", status));//todo: create valid exception
         }
         try {
-            return mapper.readValue(response.bodyAsString(), WeatherInfo.class);
+            return mapper.readValue(response.bodyAsString(), WeatherInfoResponse.class);
         } catch (JsonProcessingException e) {
-            LOGGER.warn("Unable to deserialize {}. Raw msg: {}", WeatherInfo.class.getSimpleName(), response.toString());
+            LOGGER.warn("Unable to deserialize {}. Raw msg: {}", WeatherInfoResponse.class.getSimpleName(), response.toString());
             throw new RuntimeException(e);//todo: create valid exception
         }
     }

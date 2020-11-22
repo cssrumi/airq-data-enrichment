@@ -20,6 +20,7 @@
 
     <properties>
         <common.version>1.14.1</common.version>
+        <wiremock.version>2.27.2</wiremock.version>
     </properties>
 
     <dependencies>
@@ -80,6 +81,12 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>${wiremock.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
