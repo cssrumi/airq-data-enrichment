@@ -17,6 +17,11 @@ mp:
       gios-measurement:
         connector: smallrye-kafka
         topic: gios.measurement
+        group:
+          id: ${quarkus.applicaiton.name}
+        auto:
+          offset:
+            reset: earliest
         key:
           deserializer: pl.airq.common.kafka.TSKeyDeserializer
         value:
@@ -31,8 +36,6 @@ mp:
           serializer: org.apache.kafka.common.serialization.StringSerializer
 
 kafka:
-  group:
-    id: airq-data-enrichment
   bootstrap:
     servers: 10.1.1.51:9092
 
