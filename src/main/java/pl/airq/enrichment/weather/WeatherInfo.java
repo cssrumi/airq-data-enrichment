@@ -1,5 +1,7 @@
 package pl.airq.enrichment.weather;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.Objects;
 
@@ -12,7 +14,12 @@ public class WeatherInfo {
     public final Float humidity;
     public final Float pressure;
 
-    public WeatherInfo(Float temperature, Float wind, Float windDirection, Float humidity, Float pressure) {
+    @JsonCreator
+    public WeatherInfo(@JsonProperty("temperature") Float temperature,
+                       @JsonProperty("wind") Float wind,
+                       @JsonProperty("windDirection") Float windDirection,
+                       @JsonProperty("humidity") Float humidity,
+                       @JsonProperty("pressure") Float pressure) {
         this.temperature = temperature;
         this.wind = wind;
         this.windDirection = windDirection;
