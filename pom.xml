@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>pl.airq</groupId>
     <artifactId>data-enrichment</artifactId>
-    <version>1.1.2-SNAPSHOT</version>
+    <version>1.1.2</version>
 
     <parent>
         <groupId>pl.airq</groupId>
@@ -15,7 +15,7 @@
         <developerConnection>scm:git:https://github.com/cssrumi/airq-data-enrichment.git</developerConnection>
         <connection>scm:git:https://github.com/cssrumi/airq-data-enrichment.git</connection>
         <url>https://github.com/cssrumi/airq-data-enrichment.git</url>
-        <tag>HEAD</tag>
+        <tag>data-enrichment-1.1.2</tag>
     </scm>
 
     <properties>
