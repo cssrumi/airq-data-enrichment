@@ -37,7 +37,8 @@ class GiosMeasurementEventConsumer {
         return Uni.createFrom().item(parser.deserializeDomainEvent(message.getPayload()))
                   .invoke(airqEvent -> LOGGER.info("AirqEvent arrived: {}, key: {}", airqEvent, getKey(message).value()))
                   .flatMap(event -> dispatch(getKey(message), event))
-                  .onFailure().recoverWithItem(Uni.createFrom().voidItem());
+                  .onFailure().recoverWithItem(Uni.createFrom().voidItem())
+                  .call(() -> Uni.createFrom().completionStage(message.ack()));
     }
 
     @SuppressWarnings("unchecked")

@@ -260,6 +260,8 @@ class IntegrationTest {
         TSKey createdKey = sendEvent(createdEvent);
         AirqEvent<EnrichedDataEventPayload> receivedEvent1 = awaitForEvent(createdKey);
 
+        sleep(Duration.ofSeconds(1));
+
         TSKey createdKeyWithDifferentPm10 = sendEvent(createdEventWithDifferentPm10);
         AirqEvent<EnrichedDataEventPayload> receivedEvent2 = awaitForEvent(createdKeyWithDifferentPm10);
 
@@ -361,6 +363,13 @@ class IntegrationTest {
     private void verifyEnrichedDataCount(int value) {
         Set<EnrichedData> data = query.findAll().await().atMost(Duration.ofSeconds(2));
         assertThat(data).hasSize(value);
+    }
+
+    private void sleep(Duration duration) {
+        try {
+            Thread.sleep(duration.toMillis());
+        } catch (InterruptedException ignore) {
+        }
     }
 
     @Dependent
