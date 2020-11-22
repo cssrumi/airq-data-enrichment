@@ -14,7 +14,7 @@ public class WeatherInfo {
     public final Float humidity;
     public final Float pressure;
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public WeatherInfo(@JsonProperty("temperature") Float temperature,
                        @JsonProperty("wind") Float wind,
                        @JsonProperty("windDirection") Float windDirection,

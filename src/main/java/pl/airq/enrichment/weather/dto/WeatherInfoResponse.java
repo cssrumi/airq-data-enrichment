@@ -11,7 +11,7 @@ public class WeatherInfoResponse {
     public final Long timestamp;
     public final WeatherInfo weatherInfo;
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public WeatherInfoResponse(@JsonProperty("timestamp") Long timestamp,
                                @JsonProperty("weatherInfo") WeatherInfo weatherInfo) {
         this.timestamp = timestamp;
