@@ -390,7 +390,9 @@ class IntegrationTest {
             properties.put("group.id", "airq-data-enrichment-int-test");
             properties.put("auto.offset.reset", "earliest");
 
-            KafkaConsumer<TSKey, AirqEvent<EnrichedDataEventPayload>> consumer = new KafkaConsumer<>(properties, new TSKeyDeserializer(), new AirqEventDeserializer<>(parser));
+            KafkaConsumer<TSKey, AirqEvent<EnrichedDataEventPayload>> consumer = new KafkaConsumer<>(
+                    properties, new TSKeyDeserializer(), new AirqEventDeserializer<>(parser)
+            );
             consumer.subscribe(Collections.singleton(dataEnrichedTopic));
             return consumer;
         }
