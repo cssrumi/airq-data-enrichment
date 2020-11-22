@@ -36,17 +36,8 @@ public class WeatherClient {
 
     public Uni<WeatherInfo> getWeatherInfo(StationId stationId, OffsetDateTime timestamp) {
         return client.post("/v1/weather/info")
-                     .sendJson(serialize(WeatherInfoRequest.from(timestamp, stationId)))
+                     .sendJson(WeatherInfoRequest.from(timestamp, stationId))
                      .map(this::deserialize);
-    }
-
-    private String serialize(WeatherInfoRequest request) {
-        try {
-            return mapper.writeValueAsString(request);
-        } catch (JsonProcessingException e) {
-            LOGGER.warn("Unable to serialize {}. Object: {}", WeatherInfoRequest.class.getSimpleName(), request.toString());
-            throw new RuntimeException(e);
-        }
     }
 
     private WeatherInfo deserialize(HttpResponse<?> response) {
