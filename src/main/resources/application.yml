@@ -18,7 +18,7 @@ mp:
         connector: smallrye-kafka
         topic: gios.measurement
         group:
-          id: ${quarkus.applicaiton.name}
+          id: ${quarkus.application.name}
         auto:
           offset:
             reset: earliest
