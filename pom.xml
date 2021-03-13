@@ -19,7 +19,7 @@
     </scm>
 
     <properties>
-        <common.version>1.14.3-SNAPSHOT</common.version>
+        <common.version>1.14.3</common.version>
         <wiremock.version>2.27.2</wiremock.version>
     </properties>
 
