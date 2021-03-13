@@ -26,6 +26,18 @@ mp:
           deserializer: pl.airq.common.kafka.TSKeyDeserializer
         value:
           deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      update-gios-measurement:
+        connector: smallrye-kafka
+        topic: update.gios.measurement
+        group:
+          id: ${quarkus.application.name}
+        auto:
+          offset:
+            reset: earliest
+        key:
+          deserializer: pl.airq.common.kafka.TSKeyDeserializer
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
     outgoing:
       data-enriched:
         connector: smallrye-kafka

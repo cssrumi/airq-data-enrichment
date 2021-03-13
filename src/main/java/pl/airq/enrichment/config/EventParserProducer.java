@@ -12,6 +12,7 @@ import pl.airq.common.process.ctx.enriched.EnrichedDataUpdatedEvent;
 import pl.airq.common.process.ctx.gios.aggragation.GiosMeasurementCreatedEvent;
 import pl.airq.common.process.ctx.gios.aggragation.GiosMeasurementDeletedEvent;
 import pl.airq.common.process.ctx.gios.aggragation.GiosMeasurementUpdatedEvent;
+import pl.airq.common.process.ctx.gios.command.UpdateGiosMeasurement;
 import pl.airq.common.process.ctx.gios.installation.GiosInstallationCreatedEvent;
 import pl.airq.common.process.ctx.gios.installation.GiosInstallationDeletedEvent;
 import pl.airq.common.process.ctx.gios.installation.GiosInstallationUpdatedEvent;
@@ -29,7 +30,8 @@ class EventParserProducer {
                 GiosMeasurementDeletedEvent.class,
                 EnrichedDataCreatedEvent.class,
                 EnrichedDataUpdatedEvent.class,
-                EnrichedDataDeletedEvent.class
+                EnrichedDataDeletedEvent.class,
+                UpdateGiosMeasurement.class
         ));
         return eventParser;
     }

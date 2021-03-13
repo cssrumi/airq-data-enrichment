@@ -19,18 +19,12 @@ public class GiosMeasurementDispatcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GiosMeasurementDispatcher.class);
 
-    private final GiosMeasurementCreatedHandler giosMeasurementCreatedHandler;
-    private final GiosMeasurementUpdatedHandler giosMeasurementUpdatedHandler;
-    private final GiosMeasurementDeletedHandler giosMeasurementDeletedHandler;
     private final Map<String, BiFunction<TSKey, AirqEvent<GiosMeasurementEventPayload>, Uni<Boolean>>> dispatchMap;
 
     @Inject
     public GiosMeasurementDispatcher(GiosMeasurementCreatedHandler giosMeasurementCreatedHandler,
                                      GiosMeasurementUpdatedHandler giosMeasurementUpdatedHandler,
                                      GiosMeasurementDeletedHandler giosMeasurementDeletedHandler) {
-        this.giosMeasurementCreatedHandler = giosMeasurementCreatedHandler;
-        this.giosMeasurementUpdatedHandler = giosMeasurementUpdatedHandler;
-        this.giosMeasurementDeletedHandler = giosMeasurementDeletedHandler;
         this.dispatchMap = Map.of(
                 GiosMeasurementCreatedEvent.class.getSimpleName(), giosMeasurementCreatedHandler::handle,
                 GiosMeasurementUpdatedEvent.class.getSimpleName(), giosMeasurementUpdatedHandler::handle,
